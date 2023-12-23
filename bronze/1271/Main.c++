@@ -24,7 +24,7 @@
 #include<cmath>
 
 using namespace std;
-int main(void) {
+int main() {
   int interval = 3;
   bool isFinish = false;
   string n, m, q, r;
@@ -54,23 +54,11 @@ int main(void) {
       mv.push_back(stoi(m.substr(i, interval)));
     };
   }
-  
-  for(vector<int>::reverse_iterator rit = nv.rbegin(); rit != nv.rend(); ++rit){
-    cout << *rit;
-  };
 
-  cout << "\n" << "sizeof nv: " << nv.size() << "\n";
-
-  for(vector<int>::reverse_iterator rit = mv.rbegin(); rit != mv.rend(); ++rit){
-    cout << *rit;
-  }
-
-  cout << "\n" << "sizeof mv: " << mv.size() << "\n";
     while(qv.size() <= nv.size() - mv.size()){ // 자리수 갱신 -> 초기에만 한 번 호출
     qv.push_back(0);
   };
 
-  cout <<"sizeof qv: " << qv.size() << "\n";
 
 
   while(!isFinish){
@@ -117,10 +105,14 @@ int main(void) {
     if(nv.size() == mv.size()) {
       bool isNvLarge = true;
 
-      for(int i = 0; i < mv.size(); i++){
-        if(nv[i] < mv[i]){
-          isNvLarge = false;  
+      if(nv[nv.size() - 1] == mv[mv.size() - 1]){
+        for(int i = 0; i < mv.size(); i++){
+          if(nv[i] < mv[i]){
+            isNvLarge = false;  
+          };
         };
+      } else if(nv[nv.size() - 1] < mv[mv.size() - 1]){
+        isNvLarge = false;
       };
 
       if(isNvLarge == true) {
@@ -137,9 +129,6 @@ int main(void) {
         // moveIndex가 있다면 해당 위치만큼 이동 시키고
         nv[i + moveIndex] -= mv[i];
         // 만약 해당 자리수가 음수면, 다시 채우고, 다음 자리수 - 1 하기
-        if(nv[1] == 988) {
-          cout << "nv1 == 988 nv[2] = " << nv[2] << "\n";
-        }
       };
     
     
@@ -147,18 +136,14 @@ int main(void) {
       // 다 검사 한다
       for(int i = 0; i < nv.size(); i++) {
         if(nv[i] < 0) {
-          cout << "Index minus" << i << "-" << nv[i] << "\n";
           nv[i] += valForIndex;
-          cout << nv[i + 1];
           nv[i + 1]--;
-          cout << nv[i + 1] << "\n";
         };
       };
 
      
       // 이후 최상위 nv요소가 0이라면 사이즈 줄이기
       while(nv[nv.size() - 1] == 0 && nv.size() > 1) {
-        cout << nv.size() << "\n";
         nv.pop_back();
       };
 
