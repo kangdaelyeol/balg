@@ -27,10 +27,10 @@ public class Main {
     BigInteger n = sc.nextBigInteger();
     BigInteger m = sc.nextBigInteger();
 
-    BigInteger d = n.divide(m);
+    BigInteger q = n.divide(m);
     BigInteger r = n.remainder(m);
 
-    System.out.println(d);
+    System.out.println(q);
     System.out.print(r);
     sc.close();
   }
