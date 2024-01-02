@@ -6,100 +6,55 @@
 
 using namespace std;
 
-int UDSearchL(int index, vector<int>& BVector) {
+int UDSearchL(size_t index, vector<int>& BVector) {
+	if (BVector.size() == 1)
+		return 0;
 	// 왼쪽부분으로 하향식 검사
-	vector<vector<int> > LDQueue;
+	vector<int> Vlen(index, 0);
+	int maxLen = 0;
 
 	int now = BVector[index];
-	int leftLen = 0;
-	// 사이즈가 1 인 경우
-	if (BVector.size() == 1) {
-		return 0;
-	}
-	// LDQueue 채우기
-	for (int i = index - 1; i >= 0; i--) {
-		int leftVal = BVector[i];
-		if (leftVal < now) {
-			bool isNew = true;
-			for (size_t s = 0; s < LDQueue.size(); s++) {
-				for (size_t t = LDQueue[s].size() - 1; t > 0; t--) {
-					if (LDQueue[s][t] < leftVal && LDQueue[s][t - 1] > leftVal) {
-						vector<int> newV;
-						copy(LDQueue[s].begin() + 0, LDQueue[s].begin() + t - 1, back_inserter(newV));
-						newV.push_back(leftVal);
-						LDQueue.push_back(newV);
-						isNew = false;
-					}
-				}
-				// 마지막 요소보다 작다면 inQueue
-				if (leftVal < LDQueue[s][LDQueue[s].size() - 1]) {
-					LDQueue[s].push_back(leftVal);
-					isNew = false;
+	for (int i = 0; i < index; i++) {
+		if (BVector[i] < now) {
+			int maxD = 0;
+			Vlen[i]++;
+			for (int j = 0; j < i; j++) {
+				if (BVector[i] > BVector[j]) {
+					if (maxD < Vlen[j]) maxD = Vlen[j];
 				}
 			}
-			if (isNew) {
-				vector<int> newV;
-				newV.push_back(leftVal);
-				LDQueue.push_back(newV);
-			}
+			Vlen[i] += maxD;
 		}
+	};
+	for (int i = 0; i < Vlen.size(); i++) {
+		if (maxLen < Vlen[i]) maxLen = Vlen[i];
 	}
-	// LDQueue 최대 사이즈
-	for (size_t i = 0; i < LDQueue.size(); i++) {
-		if (leftLen < LDQueue[i].size()) leftLen = LDQueue[i].size();
-	}
-
-	// 중앙 부분 + 1해서 해당 index기준 최대 수열 길이 반환
-	return leftLen;
-};
+	return maxLen;
+}
 
 int UDSearchR(int index, vector<int>& BVector) {
-	// 왼쪽부분으로 하향식 검사
-	vector<vector<int> > RDQueue;
+	if (BVector.size() == 1)
+		return 0;
+	vector<int> Vlen(BVector.size(), 0);
+	int maxLen = 0;
 
 	int now = BVector[index];
-	int rightLen = 0;
-	// 사이즈가 1 인 경우
-	if (BVector.size() == 1) {
-		return 0;
-	}
-
-	// RDQueue채우기
-	for (int i = index + 1; i < BVector.size(); i++) {
-		int rightVal = BVector[i];
-		if (rightVal < now) {
-			bool isNew = true;
-			for (size_t s = 0; s < RDQueue.size(); s++) {
-				for (size_t t = RDQueue[s].size() - 1; t > 0; t--) {
-					if (RDQueue[s][t] < rightVal && RDQueue[s][t - 1] > rightVal) {
-						vector<int> newV;
-						copy(RDQueue[s].begin() + 0, RDQueue[s].begin() + t - 1, back_inserter(newV));
-						newV.push_back(rightVal);
-						RDQueue.push_back(newV);
-						isNew = false;
-					}
-				}
-				// 마지막 요소보다 작다면 inQueue
-				if (rightVal < RDQueue[s][RDQueue[s].size() - 1]) {
-					RDQueue[s].push_back(rightVal);
-					isNew = false;
+	for (int i = BVector.size() - 1; i > index; i--) {
+		if (BVector[i] < now) {
+			int maxD = 0;
+			Vlen[i]++;
+			for (int j = BVector.size() - 1; j > i; j--) {
+				if (BVector[i] > BVector[j]) {
+					if (maxD < Vlen[j]) maxD = Vlen[j];
 				}
 			}
-			if (isNew) {
-				vector<int> newV;
-				newV.push_back(rightVal);
-				RDQueue.push_back(newV);
-			}
+			Vlen[i] += maxD;
 		}
+	};
+	for (int i = 0; i < Vlen.size(); i++) {
+		if (maxLen < Vlen[i]) maxLen = Vlen[i];
 	}
-
-	// RDQueue 쵀대 사이즈
-	for (size_t i = 0; i < RDQueue.size(); i++) {
-		if (rightLen < RDQueue[i].size()) rightLen = RDQueue[i].size();
-	}
-
-	// 중앙 부분 + 1해서 해당 index기준 최대 수열 길이 반환
-	return rightLen;
+	return maxLen;
 };
 
 int main() {
@@ -118,7 +73,10 @@ int main() {
 		BVector.push_back(num);
 		upVector.push_back(-1);
 	}
-
+	if (BVector.size() == 1) {
+		cout << 1;
+		return 0;
+	}
 	for (size_t i = 0; i + 2 < BVector.size(); i++) {
 		// 올라가는 부분 집합 push - (첫 지점은 -1)
 		if (BVector[i] < BVector[i + 1])
@@ -127,16 +85,14 @@ int main() {
 
 	for (size_t i = 1; i < upVector.size(); i++) {
 		if (upVector[i] == -1) {
-			lenL = UDSearchL(i - 1, BVector);
-			lenR = UDSearchR(i - 1, BVector);
-			len = lenL + lenR + 1;
+			len = UDSearchL(i - 1, BVector) + 1 + UDSearchR(i - 1, BVector);
 			if (len > maxLen) maxLen = len;
 		}
 	}
-	lenR = UDSearchR(0, BVector) + 1;
-	len = lenR;
 	if (len > maxLen) maxLen = len;
 	len = UDSearchL(upVector.size() - 1, BVector) + 1;
+	if (len > maxLen) maxLen = len;
+	len = UDSearchR(0, BVector) + 1;
 	if (len > maxLen) maxLen = len;
 	cout << maxLen;
 
