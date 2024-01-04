@@ -1,6 +1,4 @@
-from collections import deque
-
-d = deque()
+d = []
 
 a = int(input())
 listIn = []
